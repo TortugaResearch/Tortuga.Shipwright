@@ -41,11 +41,11 @@ Traits should be marked with the `Trait` attribute. (This is not currently enfor
 
 Trait classes may be marked as `public` or, if in the same assembly, `internal`. 
 
-The container class uses the `UseTrait` attribute. For example:
+The container class uses the `UseTrait` attribute and must be marked `partial`. For example:
 
 ```
 [UseTrait(typeof(MyTrait)]
-public class MyContiner { ... }
+public partial class MyContiner { ... }
 ```
 
 ### Exposing Members
@@ -116,5 +116,13 @@ The container will then be responsible for implementing the partial method.
 If a trait implements an interface, then it's container will automatically implement it as well. All interface methods will call back to the trait.
 
 The container explicitly implements the interface. Use the `Expose` attribute if you also want the methods to be marked as `public`.
+
+
+### XML Docs
+
+If the trait is in the same project as the container, XML Docs will be automatically included in the generated code.
+
+Shipwright does not currently support XML Docs on traits defined in a different project. (This appears to be a limitation of Roslyn.)
+
 
 

@@ -7,10 +7,10 @@
 public class ContainerAttribute : Attribute
 {
 
-	/// <summary>
-	/// If set to true and the property's type is an interface, then that interface will be added to the owning class. 
-	/// </summary>
-	public bool RegisterInterface { get; set; }
+    /// <summary>
+    /// If set to true and the property's type is an interface, then that interface will be added to the owning class. 
+    /// </summary>
+    public bool RegisterInterface { get; set; }
 
-	//TODO-4 Add optional support.
+    //Task-4 Add optional support.
 }

@@ -4,6 +4,12 @@
 		<TargetFrameworks>netstandard2.0</TargetFrameworks>
 		<Nullable>enable</Nullable>
 		<LangVersion>10.0</LangVersion>
+		<Authors>David Tomcik, Jonathan Allen</Authors>
+		<Company>Tortuga Research</Company>
+		<Description>A trait engine for C#.</Description>
+		<PackageTags>Source Generator</PackageTags>
+		<ProductName>Tortuga Shipwright</ProductName>
+		<Deterministic>true</Deterministic>
 
 		<AssemblyVersion>0.1.0</AssemblyVersion>
 		<Version>0.1.0</Version>
@@ -13,6 +19,12 @@
 		<PackageProjectUrl>https://github.com/TortugaResearch/Shipwright</PackageProjectUrl>
 		<RepositoryUrl>https://github.com/TortugaResearch/Shipwright.git</RepositoryUrl>
 		<RepositoryType>git</RepositoryType>
+
+		<Nullable>enable</Nullable>
+		<TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+		<WarningsAsErrors />
+		
+		<DocumentationFile>Tortuga.Shipwright.xml</DocumentationFile>
 
 	</PropertyGroup>
 
