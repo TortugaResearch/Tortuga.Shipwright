@@ -1,5 +1,31 @@
 # Tortuga Shipwright
 
+## Installation
+
+
+To register the Source Generator, add the following to your project file.
+
+```
+	<!-- Code Generator -->
+	<ItemGroup>
+		<PackageReference Include="Tortuga.Shipwright" Version="0.1.0" />
+	</ItemGroup>
+
+	<PropertyGroup>
+		<EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
+		<CompilerGeneratedFilesOutputPath>Generated</CompilerGeneratedFilesOutputPath>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<!-- Don't include the output from a previous source generator execution into future runs; the */** trick here ensures that there's
+  at least one subdirectory, which is our key that it's coming from a source generator as opposed to something that is coming from
+  some other tool. -->
+		<Compile Remove="$(CompilerGeneratedFilesOutputPath)/*/**/*.cs" />
+	</ItemGroup>
+```
+
+The `EmitCompilerGeneratedFiles` setting is not required, but it does make trouble-shooting easier. Check  `Show All Files" in Visual Studio to see the generated files.
+
 ## Trait Engine
 
 ### Terminology
