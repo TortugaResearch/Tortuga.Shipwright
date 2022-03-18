@@ -356,9 +356,25 @@ public class TraitGenerator : ISourceGenerator
 
                     case IEventSymbol eventSymbol:
 
-                        //Task-1 Exposed events
                         code.AppendLine($"// Expose events are not supported yet. Cannot expose {member.Name}");
                         receiver.Log.Add($"// Expose events are not supported yet. Cannot expose {member.Name}");
+
+                        {
+                            var eventType = (INamedTypeSymbol)eventSymbol.Type;
+                            var eventTypeName = eventType.FullName();
+
+
+                            var signature = $"{accessibility}{inheritance}event {eventTypeName} {eventSymbol.Name}";
+
+                            if (isAbstract)
+                                code.AppendLine(signature + ";");
+                            else
+                                using (code.BeginScope(signature))
+                                {
+                                    code.AppendLine($"add {{ {fieldReference}.{eventSymbol.Name} += value;}}");
+                                    code.AppendLine($"remove {{ {fieldReference}.{eventSymbol.Name} -= value;}}");
+                                }
+                        }
 
                         break;
 

@@ -56,6 +56,11 @@ namespace Sample
 			get => __Trait0.Name;
 		}
 		// Expose events are not supported yet. Cannot expose ValueChanged
+		public event System.EventHandler<System.EventArgs>? ValueChanged
+		{
+			add { __Trait0.ValueChanged += value;}
+			remove { __Trait0.ValueChanged -= value;}
+		}
 		private partial System.String OnGetName( );
 
 		private void __RegisterTraits()
