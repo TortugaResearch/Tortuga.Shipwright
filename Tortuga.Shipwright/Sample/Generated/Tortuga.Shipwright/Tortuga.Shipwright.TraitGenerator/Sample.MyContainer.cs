@@ -24,6 +24,18 @@ namespace Sample
 			return ((Sample.IMath)__Trait0).Add(a, b);
 		}
 
+		
+		System.Int32 Sample.IMath.BaseValue
+		{
+			get => ((Sample.IMath)__Trait0).BaseValue;
+			set => ((Sample.IMath)__Trait0).BaseValue = value;
+		}
+		
+		System.Int32 Sample.IMath.Counter
+		{
+			get => ((Sample.IMath)__Trait0).Counter;
+			set => ((Sample.IMath)__Trait0).Counter = value;
+		}
 		// Exposing trait Sample.MyTrait
 
 		
@@ -43,8 +55,8 @@ namespace Sample
 		{
 			get => __Trait0.Name;
 		}
+		// Expose events are not supported yet. Cannot expose ValueChanged
 		private partial System.String OnGetName( );
-
 
 		private void __RegisterTraits()
 		{
@@ -52,5 +64,6 @@ namespace Sample
 			__Trait0.OnGetName = OnGetName;
 			__Trait0.Container = this;
 		}
+
 	}
 }

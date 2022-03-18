@@ -11,4 +11,11 @@ public partial class MyContainer
 
 
     string IHasPets.Pets => "Spot";
+
+
+    public event EventHandler<EventArgs> ValueChanged
+    {
+        add { __Trait0.ValueChanged += value; }
+        remove { __Trait0.ValueChanged -= value; }
+    }
 }

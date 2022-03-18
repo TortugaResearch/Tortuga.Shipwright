@@ -113,10 +113,11 @@ The container will then be responsible for implementing the partial method.
 
 ### Automatically Implementing an Interface
 
-If a trait implements an interface, then it's container will automatically implement it as well. All interface methods will call back to the trait.
+If a trait implements an interface, then it's container will automatically implement it as well. All interface methods and properties will call back to the trait.
 
-The container explicitly implements the interface. Use the `Expose` attribute if you also want the methods to be marked as `public`.
+The container explicitly implements the interface. Use the `Expose` attribute on each member if you also want the methods to be marked as `public`.
 
+Warning: Interfaces with `init` properties are not supported.
 
 ### XML Docs
 
