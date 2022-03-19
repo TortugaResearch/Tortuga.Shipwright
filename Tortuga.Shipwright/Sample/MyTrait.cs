@@ -18,7 +18,7 @@ public class MyTrait : IMath
     }
 
     [Container(RegisterInterface = true)]
-    public IHasPets Container { get; set; } = null!;
+    public IHasPets? Container { get; set; } = null!;
 
     int baseValue;
     int IMath.BaseValue
@@ -41,6 +41,10 @@ public class MyTrait : IMath
     public event EventHandler<EventArgs>? ValueChanged;
 
     public void OnValueChanged() => ValueChanged?.Invoke(this, EventArgs.Empty);
+
+
+    [Container()]
+    public IHasCustomerKey? CustomerKeyProvider { get; set; }
 }
 
 

@@ -12,5 +12,10 @@ public class ContainerAttribute : Attribute
     /// </summary>
     public bool RegisterInterface { get; set; }
 
-    //Task-4 Add optional support.
+
+    /// <summary>
+    /// If set to true, the container isn't required to implement the indicated interface. When that happens, a null be assigned to the property.
+    /// </summary>
+    public bool IsOptional { get; set; }
+
 }

@@ -59,7 +59,7 @@ public class TraitGenerator : ISourceGenerator
                     .Where(x => (bool)(x.GetAttribute<ContainerAttribute>()?.NamedArguments.SingleOrDefault(x => x.Key == "RegisterInterface").Value.Value ?? false)).Select(x => x.Type).OfType<INamedTypeSymbol>();
 
                 var interfacesNames = interfacesNamesA.Concat(interfacesNamesB)
-                    .Distinct<INamedTypeSymbol>(SymbolEqualityComparer.Default).Select(i => i.FullName()).ToList();
+                    .Distinct<INamedTypeSymbol>(SymbolEqualityComparer.Default).Select(i => i.FullName().NotNullType()).ToList();
                 var interfaceString = interfacesNames.Any() ? ": " + string.Join(", ", interfacesNames) : "";
 
 
@@ -118,9 +118,14 @@ public class TraitGenerator : ISourceGenerator
                     code.AppendLine($"{traitFieldNames[traitClass]}.{partialProperty.Name} = {partialProperty.Name};");
 
 
-                foreach (var partialProperty in traitClass.GetMembers()
+                foreach (var containerProperty in traitClass.GetMembers()
                         .OfType<IPropertySymbol>().Where(m => m.HasAttribute<ContainerAttribute>()))
-                    code.AppendLine($"{traitFieldNames[traitClass]}.{partialProperty.Name} = this;");
+                {
+                    if (containerProperty.GetAttribute<ContainerAttribute>()!.GetNamedArgument("IsOptional", false))
+                        code.AppendLine($"{traitFieldNames[traitClass]}.{containerProperty.Name} = this;");
+                    else
+                        code.AppendLine($"{traitFieldNames[traitClass]}.{containerProperty.Name} = this as {containerProperty.Type.TryFullName().NotNullType()};");
+                }
             }
         }
         code.AppendLine();

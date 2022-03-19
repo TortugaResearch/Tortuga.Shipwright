@@ -2,7 +2,7 @@
 
 namespace Sample
 {
-	partial class MyContainer: Sample.IMath, Sample.IHasPets
+	partial class SimpleContainer: Sample.IMath, Sample.IHasPets
 	{
 
 		private bool __TraitsRegistered;
