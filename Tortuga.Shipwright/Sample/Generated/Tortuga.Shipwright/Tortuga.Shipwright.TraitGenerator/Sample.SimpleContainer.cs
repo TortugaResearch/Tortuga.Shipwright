@@ -75,7 +75,7 @@ namespace Sample
 		{
 			__TraitsRegistered = true;
 			__Trait0.OnGetName = OnGetName;
-			__Trait0.Container = this as Sample.IHasPets;
+			__Trait0.Container = this;
 			__Trait0.CustomerKeyProvider = this as Sample.IHasCustomerKey;
 		}
 

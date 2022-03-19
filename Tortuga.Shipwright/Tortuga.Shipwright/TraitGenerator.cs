@@ -122,9 +122,9 @@ public class TraitGenerator : ISourceGenerator
                         .OfType<IPropertySymbol>().Where(m => m.HasAttribute<ContainerAttribute>()))
                 {
                     if (containerProperty.GetAttribute<ContainerAttribute>()!.GetNamedArgument("IsOptional", false))
-                        code.AppendLine($"{traitFieldNames[traitClass]}.{containerProperty.Name} = this;");
-                    else
                         code.AppendLine($"{traitFieldNames[traitClass]}.{containerProperty.Name} = this as {containerProperty.Type.TryFullName().NotNullType()};");
+                    else
+                        code.AppendLine($"{traitFieldNames[traitClass]}.{containerProperty.Name} = this;");
                 }
             }
         }

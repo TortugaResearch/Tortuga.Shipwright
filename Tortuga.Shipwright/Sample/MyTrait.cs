@@ -49,7 +49,7 @@ public class MyTrait : IMath
     public void OnValueChanged() => ValueChanged?.Invoke(this, EventArgs.Empty);
 
 
-    [Container()]
+    [Container(IsOptional = true)]
     public IHasCustomerKey? CustomerKeyProvider { get; set; }
 }
 
