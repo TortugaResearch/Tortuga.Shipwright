@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Sample</name>
+    </assembly>
+    <members>
+        <member name="P:Sample.MyContainer.Counter">
+            <summary>
+            Gets or sets the counter.
+            </summary>
+            <value>The counter.</value>
+            <remarks>This should be copied from the trait to the container.</remarks>
+        </member>
+        <member name="P:Sample.SimpleContainer.Counter">
+            <summary>
+            Gets or sets the counter.
+            </summary>
+            <value>The counter.</value>
+            <remarks>This should be copied from the trait to the container.</remarks>
+        </member>
+        <member name="P:Sample.MyTrait.Counter">
+            <summary>
+            Gets or sets the counter.
+            </summary>
+            <value>The counter.</value>
+            <remarks>This should be copied from the trait to the container.</remarks>
+        </member>
+    </members>
+</doc>

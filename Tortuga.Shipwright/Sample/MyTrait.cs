@@ -9,6 +9,12 @@ public class MyTrait : IMath
     [Partial]
     public Func<string> OnGetName { get; set; } = null!;
 
+
+    /// <summary>
+    /// Gets or sets the counter.
+    /// </summary>
+    /// <value>The counter.</value>
+    /// <remarks>This should be copied from the trait to the container.</remarks>
     [Expose]
     public int Counter { get; set; }
 
@@ -18,7 +24,7 @@ public class MyTrait : IMath
     }
 
     [Container(RegisterInterface = true)]
-    public IHasPets? Container { get; set; } = null!;
+    public IHasPets Container { get; set; } = null!;
 
     int baseValue;
     int IMath.BaseValue

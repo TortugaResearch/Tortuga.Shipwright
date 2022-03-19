@@ -49,7 +49,11 @@ namespace Sample
 			return __Trait0.AllPets();
 		}
 
-		
+		/// <summary>
+		/// Gets or sets the counter.
+		/// </summary>
+		/// <value>The counter.</value>
+		/// <remarks>This should be copied from the trait to the container.</remarks>
 		public   System.Int32 Counter
 		{
 			get => __Trait0.Counter;

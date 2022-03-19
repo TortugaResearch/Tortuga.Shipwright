@@ -123,6 +123,8 @@ Warning: Interfaces with `init` properties are not supported.
 
 If the trait is in the same project as the container, XML Docs will be automatically included in the generated code.
 
+This requires `DocumentationFile` to be enabled at the project level.
+
 Shipwright does not currently support XML Docs on traits defined in a different project. (This appears to be a limitation of Roslyn.)
 
 
