@@ -20,7 +20,16 @@ public class MyTrait : IMath
     [Container(RegisterInterface = true)]
     public IHasPets Container { get; set; } = null!;
 
-    int IMath.BaseValue { get; set; }
+    int baseValue;
+    int IMath.BaseValue
+    {
+        get => baseValue;
+        set
+        {
+            baseValue = value;
+            OnValueChanged();
+        }
+    }
 
     [Expose]
     public string AllPets()
@@ -44,10 +53,14 @@ public interface IMath
     int Counter { get; set; }
 
     int BaseValue { get; set; }
+
+    event EventHandler<EventArgs>? ValueChanged;
+
 }
 
 
 public interface IHasPets
 {
     public string Pets { get; }
+
 }

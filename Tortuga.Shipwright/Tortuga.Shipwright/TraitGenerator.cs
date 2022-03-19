@@ -356,9 +356,6 @@ public class TraitGenerator : ISourceGenerator
 
                     case IEventSymbol eventSymbol:
 
-                        code.AppendLine($"// Expose events are not supported yet. Cannot expose {member.Name}");
-                        receiver.Log.Add($"// Expose events are not supported yet. Cannot expose {member.Name}");
-
                         {
                             var eventType = (INamedTypeSymbol)eventSymbol.Type;
                             var eventTypeName = eventType.FullName();
@@ -456,9 +453,19 @@ public class TraitGenerator : ISourceGenerator
                         break;
 
                     case IEventSymbol eventSymbol:
-                        code.AppendLine($"// Interface events are not supported yet. Cannot expose {interfaceType.FullName()}.{member.Name}");
-                        receiver.Log.Add($"// Interface events are not supported yet. Cannot expose {interfaceType.FullName()}.{member.Name}");
-                        //Task-3 Events in exposed interfaces
+                        {
+                            var eventType = (INamedTypeSymbol)eventSymbol.Type;
+                            var eventTypeName = eventType.FullName();
+
+
+                            var signature = $"event {eventTypeName} {interfaceType.FullName()}.{eventSymbol.Name}";
+
+                            using (code.BeginScope(signature))
+                            {
+                                code.AppendLine($"add {{ {fieldReference}.{eventSymbol.Name} += value;}}");
+                                code.AppendLine($"remove {{ {fieldReference}.{eventSymbol.Name} -= value;}}");
+                            }
+                        }
                         break;
 
                     default:

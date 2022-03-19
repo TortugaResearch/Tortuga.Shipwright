@@ -36,6 +36,11 @@ namespace Sample
 			get => ((Sample.IMath)__Trait0).Counter;
 			set => ((Sample.IMath)__Trait0).Counter = value;
 		}
+		event System.EventHandler<System.EventArgs>? Sample.IMath.ValueChanged
+		{
+			add { ((Sample.IMath)__Trait0).ValueChanged += value;}
+			remove { ((Sample.IMath)__Trait0).ValueChanged -= value;}
+		}
 		// Exposing trait Sample.MyTrait
 
 		
@@ -55,7 +60,6 @@ namespace Sample
 		{
 			get => __Trait0.Name;
 		}
-		// Expose events are not supported yet. Cannot expose ValueChanged
 		public event System.EventHandler<System.EventArgs>? ValueChanged
 		{
 			add { __Trait0.ValueChanged += value;}
