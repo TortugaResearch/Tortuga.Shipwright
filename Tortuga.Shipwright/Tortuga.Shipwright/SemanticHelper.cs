@@ -312,6 +312,37 @@ static class SemanticHelper
         return (T?)(attribute.NamedArguments.SingleOrDefault(x => x.Key == name).Value.Value);
     }
 
+
+    public static T? GetConstructorArgumentOrNull<T>(this AttributeData attribute, string name, List<string> log)
+    {
+        if (attribute == null)
+            throw new ArgumentNullException(nameof(attribute), $"{nameof(attribute)} is null.");
+
+        if (string.IsNullOrEmpty(name))
+            throw new ArgumentException($"{nameof(name)} is null or empty.", nameof(name));
+
+        if (attribute.AttributeConstructor == null)
+            return default;
+
+        var index = -1;
+        for (int i = 0; i < attribute.AttributeConstructor.Parameters.Length; i++)
+        {
+            if (attribute.AttributeConstructor.Parameters[i].Name == name)
+            {
+                index = i;
+                break;
+            }
+        }
+        if (index == -1)
+            return default;
+
+        var value = attribute.ConstructorArguments[index].Value;
+        if (value == null)
+            return default;
+
+        return (T?)value;
+    }
+
     public static string? TypeConstraintString(this IMethodSymbol symbol)
     {
         if (!symbol.IsGenericMethod)
@@ -349,4 +380,5 @@ static class SemanticHelper
 
     }
 }
+
 

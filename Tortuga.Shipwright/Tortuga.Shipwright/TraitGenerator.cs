@@ -1,5 +1,6 @@
 ﻿using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Text;
+using System.ComponentModel;
 using System.Text;
 
 namespace Tortuga.Shipwright;
@@ -216,6 +217,41 @@ public class TraitGenerator : ISourceGenerator
         }
     }
 
+    static List<string> CopyAttributes(ISymbol member, List<string> log)
+    {
+        var result = new List<string>();
+
+        var oAttribute = member.GetAttribute<ObsoleteAttribute>();
+        if (oAttribute != null)
+        {
+            var message = oAttribute.GetConstructorArgumentOrNull<string>("message", log);
+            string formattedMessage = message != null ? "@\"" + message.Replace("\"", "\"\"") + "\"" : "null";
+
+            var error = oAttribute.GetConstructorArgumentOrNull<bool?>("error", log);
+
+            if (error != null)
+                result.Add($"[System.Obsolete({formattedMessage}, {(error.Value ? "true" : "false")})]");
+            else if (message != null)
+                result.Add($"[System.Obsolete({formattedMessage})]");
+            else
+                result.Add($"[System.Obsolete]");
+        }
+
+        var ebAttribute = member.GetAttribute<EditorBrowsableAttribute>();
+        if (ebAttribute != null)
+        {
+            var state = (EditorBrowsableState?)ebAttribute.GetConstructorArgumentOrNull<int>("state", log);
+            if (state != null)
+                result.Add($"[System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.{state})]");
+            else
+                result.Add($"[System.ComponentModel.EditorBrowsableAttribute]");
+        }
+
+        return result;
+    }
+
+
+
     private static void ExposePublicMembers(SyntaxReceiver receiver, WorkItem workItem, CodeWriter code, Dictionary<INamedTypeSymbol, string> traitFieldNames)
     {
         if (receiver == null)
@@ -241,6 +277,9 @@ public class TraitGenerator : ISourceGenerator
             foreach (var member in traitClass.GetMembers().Where(m => m.HasAttribute<ExposeAttribute>()).OrderBy(m => m.Name))
             {
                 var exposeAttribute = member.GetAttribute<ExposeAttribute>()!;
+
+                var attributeStrings = CopyAttributes(member, receiver.Log);
+
 
                 //receiver.Log.Add("Inheritance value type = " + exposeAttribute.NamedArguments.SingleOrDefault(x => x.Key == "Inheritance").Value.Value?.GetType().FullName);
 
@@ -287,6 +326,7 @@ public class TraitGenerator : ISourceGenerator
                             var invoker = $"{invokerPrefix}{fieldReference}.{methodSymbol.FullName()}({arguments});";
 
                             code.AppendMultipleLines(member.GetXmlDocs());
+                            code.AppendMultipleLines(attributeStrings);
 
                             if (isAbstract)
                             {
@@ -317,6 +357,7 @@ public class TraitGenerator : ISourceGenerator
                             var signature = $"{accessibility} {inheritance} {propertyTypeName} {propertySymbol.Name}";
 
                             code.AppendMultipleLines(member.GetXmlDocs());
+                            code.AppendMultipleLines(attributeStrings);
                             using (code.BeginScope(signature))
                             {
                                 if (propertySymbol.CanRead())
@@ -367,6 +408,9 @@ public class TraitGenerator : ISourceGenerator
 
 
                             var signature = $"{accessibility}{inheritance}event {eventTypeName} {eventSymbol.Name}";
+
+                            code.AppendMultipleLines(member.GetXmlDocs());
+                            code.AppendMultipleLines(attributeStrings);
 
                             if (isAbstract)
                                 code.AppendLine(signature + ";");

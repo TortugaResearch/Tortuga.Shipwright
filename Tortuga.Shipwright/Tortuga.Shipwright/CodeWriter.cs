@@ -55,6 +55,18 @@ class CodeWriter
     }
 
     /// <summary>
+    /// Appends the multiple lines, ensuring the correct indentation is applied to each line.
+    /// </summary>
+    public void AppendMultipleLines(IEnumerable<string> lines)
+    {
+        if (lines == null)
+            return;
+
+        foreach (var line in lines)
+            AppendLine(line);
+    }
+
+    /// <summary>
     /// Appends the provided text and a new line. The appends an opening brace and increased the indentation level. 
     /// </summary>
     /// <param name="text">Text to append before starting the block.</param>

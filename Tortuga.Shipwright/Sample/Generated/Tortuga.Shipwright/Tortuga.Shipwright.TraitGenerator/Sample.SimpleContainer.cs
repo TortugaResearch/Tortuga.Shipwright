@@ -64,6 +64,31 @@ namespace Sample
 		{
 			get => __Trait0.Name;
 		}
+		
+		[System.Obsolete]
+		public   System.Boolean OldMethodA
+		{
+			get => __Trait0.OldMethodA;
+			set => __Trait0.OldMethodA = value;
+		}
+		
+		[System.Obsolete(@"This is a message")]
+		[System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Always)]
+		public   System.Boolean OldMethodB
+		{
+			get => __Trait0.OldMethodB;
+			set => __Trait0.OldMethodB = value;
+		}
+		
+		[System.Obsolete(@"This is a
+ message with ""quotes""", true)]
+		[System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+		public   System.Boolean OldMethodC
+		{
+			get => __Trait0.OldMethodC;
+			set => __Trait0.OldMethodC = value;
+		}
+		
 		public event System.EventHandler<System.EventArgs>? ValueChanged
 		{
 			add { __Trait0.ValueChanged += value;}

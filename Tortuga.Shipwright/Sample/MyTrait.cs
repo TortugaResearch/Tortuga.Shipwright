@@ -1,4 +1,5 @@
-﻿using Tortuga.Shipwright;
+﻿using System.ComponentModel;
+using Tortuga.Shipwright;
 
 namespace Sample;
 
@@ -51,6 +52,20 @@ public class MyTrait : IMath
 
     [Container(IsOptional = true)]
     public IHasCustomerKey? CustomerKeyProvider { get; set; }
+
+    [Obsolete()]
+    [Expose]
+    public bool OldMethodA { get; set; }
+
+    [Obsolete("This is a message")]
+    [Expose]
+    [EditorBrowsable]
+    public bool OldMethodB { get; set; }
+
+    [Obsolete("This is a\r\n message with \"quotes\"", true)]
+    [Expose]
+    [EditorBrowsable(EditorBrowsableState.Advanced)]
+    public bool OldMethodC { get; set; }
 }
 
 
