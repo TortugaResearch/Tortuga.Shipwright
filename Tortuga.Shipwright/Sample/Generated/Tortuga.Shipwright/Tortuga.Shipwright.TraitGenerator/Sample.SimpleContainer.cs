@@ -99,10 +99,13 @@ namespace Sample
 		}
 		private partial System.String OnGetName( );
 
+		private partial void SimpleAction( );
+
 		private void __RegisterTraits()
 		{
 			__TraitsRegistered = true;
 			__Trait0.OnGetName = OnGetName;
+			__Trait0.SimpleAction = SimpleAction;
 			__Trait0.Container = this;
 			__Trait0.CustomerKeyProvider = this as Sample.IHasCustomerKey;
 		}

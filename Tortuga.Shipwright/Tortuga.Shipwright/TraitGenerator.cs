@@ -171,7 +171,7 @@ public class TraitGenerator : ISourceGenerator
             {
                 var propertyType = (INamedTypeSymbol)propertySymbol.Type;
                 var propertyTypeName = propertyType.FullName();
-                var isAction = propertyTypeName.StartsWith("System.Action<");
+                var isAction = propertyTypeName.StartsWith("System.Action<") || propertyTypeName == "System.Action";
                 var isFunc = propertyTypeName.StartsWith("System.Func<");
                 if (!isAction && !isFunc)
                 {

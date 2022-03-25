@@ -11,6 +11,10 @@ public class MyTrait : IMath
     public Func<string> OnGetName { get; set; } = null!;
 
 
+    [Partial]
+    public Action SimpleAction { get; set; } = null!;
+
+
     /// <summary>
     /// Gets or sets the counter.
     /// </summary>

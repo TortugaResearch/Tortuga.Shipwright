@@ -14,6 +14,9 @@ public partial class MyContainer : IHasCustomerKey
 
     public int CustomerKey => 5;
 
+    private partial void SimpleAction() { }
+
+
 }
 
 
@@ -26,6 +29,8 @@ public partial class SimpleContainer
 
 
     string IHasPets.Pets => "Spot";
+
+    private partial void SimpleAction() { }
 
 }
 
