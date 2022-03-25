@@ -77,6 +77,13 @@ You may also set an inheritance rule such as `override`, `sealed`, or `virtual`.
 public ConcurrentDictionary<Type, object> ExtensionCache {get => m_ExtensionCache;}
 ```
 
+#### Additional Attributes
+
+The following attributes will be copied from an exposed trait member to the matching container member.
+
+* EditorBrowsableAttribute
+* ObsoleteAttribute
+
 ### Accessing the Container
 
 To allow the trait to get a reference to it's container, use the `Container` attribute.
@@ -118,6 +125,13 @@ If a trait implements an interface, then it's container will automatically imple
 The container explicitly implements the interface. Use the `Expose` attribute on each member if you also want the methods to be marked as `public`.
 
 Warning: Interfaces with `init` properties are not supported.
+
+#### Additional Attributes
+
+The following attributes will be copied from an exposed interface member to the matching container member.
+
+* EditorBrowsableAttribute
+* ObsoleteAttribute
 
 ### XML Docs
 

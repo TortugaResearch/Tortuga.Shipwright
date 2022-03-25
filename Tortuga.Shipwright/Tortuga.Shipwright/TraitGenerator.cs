@@ -217,17 +217,40 @@ public class TraitGenerator : ISourceGenerator
         }
     }
 
-    static List<string> CopyAttributes(ISymbol member, List<string> log)
+    //static List<string> CopyObsolete(ISymbol member)
+    //{
+    //    var result = new List<string>();
+
+    //    var oAttribute = member.GetAttribute<ObsoleteAttribute>();
+    //    if (oAttribute != null)
+    //    {
+    //        var message = oAttribute.GetConstructorArgumentOrNull<string>("message");
+    //        string formattedMessage = message != null ? "@\"" + message.Replace("\"", "\"\"") + "\"" : "null";
+
+    //        var error = oAttribute.GetConstructorArgumentOrNull<bool?>("error");
+
+    //        if (error != null)
+    //            result.Add($"[System.Obsolete({formattedMessage}, {(error.Value ? "true" : "false")})]");
+    //        else if (message != null)
+    //            result.Add($"[System.Obsolete({formattedMessage})]");
+    //        else
+    //            result.Add($"[System.Obsolete]");
+    //    }
+
+    //    return result;
+    //}
+
+    static List<string> CopyAttributes(ISymbol member)
     {
         var result = new List<string>();
 
         var oAttribute = member.GetAttribute<ObsoleteAttribute>();
         if (oAttribute != null)
         {
-            var message = oAttribute.GetConstructorArgumentOrNull<string>("message", log);
+            var message = oAttribute.GetConstructorArgumentOrNull<string>("message");
             string formattedMessage = message != null ? "@\"" + message.Replace("\"", "\"\"") + "\"" : "null";
 
-            var error = oAttribute.GetConstructorArgumentOrNull<bool?>("error", log);
+            var error = oAttribute.GetConstructorArgumentOrNull<bool?>("error");
 
             if (error != null)
                 result.Add($"[System.Obsolete({formattedMessage}, {(error.Value ? "true" : "false")})]");
@@ -240,7 +263,7 @@ public class TraitGenerator : ISourceGenerator
         var ebAttribute = member.GetAttribute<EditorBrowsableAttribute>();
         if (ebAttribute != null)
         {
-            var state = (EditorBrowsableState?)ebAttribute.GetConstructorArgumentOrNull<int>("state", log);
+            var state = (EditorBrowsableState?)ebAttribute.GetConstructorArgumentOrNull<int>("state");
             if (state != null)
                 result.Add($"[System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.{state})]");
             else
@@ -278,7 +301,7 @@ public class TraitGenerator : ISourceGenerator
             {
                 var exposeAttribute = member.GetAttribute<ExposeAttribute>()!;
 
-                var attributeStrings = CopyAttributes(member, receiver.Log);
+                var attributeStrings = CopyAttributes(member);
 
 
                 //receiver.Log.Add("Inheritance value type = " + exposeAttribute.NamedArguments.SingleOrDefault(x => x.Key == "Inheritance").Value.Value?.GetType().FullName);
@@ -443,9 +466,11 @@ public class TraitGenerator : ISourceGenerator
             code.AppendLine("// Explicit interface implementation " + interfaceType.FullName());
             var matchingTrait = workItem.TraitClasses.First(t => t.AllInterfaces.Contains(interfaceType, SymbolEqualityComparer.Default));
 
+            var fieldReference = $"(({interfaceType.FullName()}){traitFieldNames[matchingTrait]})";
+
             foreach (var member in interfaceType.GetMembers().OrderBy(m => m.Name))
             {
-                var fieldReference = $"(({interfaceType.FullName()}){traitFieldNames[matchingTrait]})";
+                var attributes = CopyAttributes(member);
 
                 switch (member)
                 {
@@ -462,6 +487,7 @@ public class TraitGenerator : ISourceGenerator
                             //We cast to the interface type in case it is explicitly implemented.
                             var invoker = $"{invokerPrefix}{fieldReference}.{methodSymbol.FullName()}({arguments});";
 
+                            code.AppendMultipleLines(attributes);
                             using (code.BeginScope(signature))
                             {
                                 code.AppendLine(invoker);
@@ -481,7 +507,8 @@ public class TraitGenerator : ISourceGenerator
 
                             var signature = $"{propertyTypeName} {interfaceType.FullName()}.{propertySymbol.Name}";
 
-                            code.AppendMultipleLines(member.GetXmlDocs());
+
+                            code.AppendMultipleLines(attributes);
                             using (code.BeginScope(signature))
                             {
                                 if (propertySymbol.CanRead())
@@ -509,6 +536,7 @@ public class TraitGenerator : ISourceGenerator
 
                             var signature = $"event {eventTypeName} {interfaceType.FullName()}.{eventSymbol.Name}";
 
+                            code.AppendMultipleLines(attributes);
                             using (code.BeginScope(signature))
                             {
                                 code.AppendLine($"add {{ {fieldReference}.{eventSymbol.Name} += value;}}");

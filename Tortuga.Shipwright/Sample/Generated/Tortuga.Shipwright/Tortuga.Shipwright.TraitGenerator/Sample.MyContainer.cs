@@ -24,17 +24,20 @@ namespace Sample
 			return ((Sample.IMath)__Trait0).Add(a, b);
 		}
 
-		
 		System.Int32 Sample.IMath.BaseValue
 		{
 			get => ((Sample.IMath)__Trait0).BaseValue;
 			set => ((Sample.IMath)__Trait0).BaseValue = value;
 		}
-		
 		System.Int32 Sample.IMath.Counter
 		{
 			get => ((Sample.IMath)__Trait0).Counter;
 			set => ((Sample.IMath)__Trait0).Counter = value;
+		}
+		[System.Obsolete]
+		System.String Sample.IMath.IAmAlsoBad
+		{
+			get => ((Sample.IMath)__Trait0).IAmAlsoBad;
 		}
 		event System.EventHandler<System.EventArgs>? Sample.IMath.ValueChanged
 		{

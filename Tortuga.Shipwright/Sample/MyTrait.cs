@@ -66,6 +66,8 @@ public class MyTrait : IMath
     [Expose]
     [EditorBrowsable(EditorBrowsableState.Advanced)]
     public bool OldMethodC { get; set; }
+
+    string IMath.IAmAlsoBad => throw new NotImplementedException();
 }
 
 
@@ -81,11 +83,15 @@ public interface IMath
 
     event EventHandler<EventArgs>? ValueChanged;
 
+    [Obsolete]
+    public string IAmAlsoBad { get; }
+
 }
 
 
 public interface IHasPets
 {
     public string Pets { get; }
+
 
 }

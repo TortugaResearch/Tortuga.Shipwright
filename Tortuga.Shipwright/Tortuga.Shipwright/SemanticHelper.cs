@@ -313,7 +313,7 @@ static class SemanticHelper
     }
 
 
-    public static T? GetConstructorArgumentOrNull<T>(this AttributeData attribute, string name, List<string> log)
+    public static T? GetConstructorArgumentOrNull<T>(this AttributeData attribute, string name)
     {
         if (attribute == null)
             throw new ArgumentNullException(nameof(attribute), $"{nameof(attribute)} is null.");
