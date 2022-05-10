@@ -8,7 +8,10 @@ To register the Source Generator, add the following to your project file.
 ```
 <!-- Code Generator -->
 <ItemGroup>
-	<PackageReference Include="Tortuga.Shipwright" Version="0.1.0" />
+	<PackageReference Include="Tortuga.Shipwright" Version="0.9.0" >
+		<PrivateAssets>all</PrivateAssets>
+	</PackageReference>
+	<PackageReference Include="Tortuga.Shipwright.Shared" Version="0.9.0" />
 </ItemGroup>
 
 <PropertyGroup>

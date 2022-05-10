@@ -2,8 +2,8 @@
 
 	<PropertyGroup>
 		<OutputType>Exe</OutputType>
-		<TargetFrameworks>net462;netstandard2.0;net6.0</TargetFrameworks>
 		<ImplicitUsings>enable</ImplicitUsings>
+		<TargetFrameworks>net462;netstandard2.0;net6.0</TargetFrameworks>
 		<Nullable>enable</Nullable>
 		<DocumentationFile>Sample.xml</DocumentationFile>
 		<LangVersion>10.0</LangVersion>
@@ -13,11 +13,15 @@
 
 	</PropertyGroup>
 
-
-	<ItemGroup>
+	<ItemGroup Condition="'$(Configuration)'=='Debug'">
 		<ProjectReference Include="..\Tortuga.Shipwright\Tortuga.Shipwright.csproj" OutputItemType="Analyzer" />
 	</ItemGroup>
 
+	<ItemGroup Condition="'$(Configuration)'=='Release'">
+		<PackageReference Include="Tortuga.Shipwright" Version="0.9.0" />
+		<PackageReference Include="Tortuga.Shipwright.Shared" Version="0.9.0" />
+	</ItemGroup>
+	
 
 	<PropertyGroup>
 		<EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>

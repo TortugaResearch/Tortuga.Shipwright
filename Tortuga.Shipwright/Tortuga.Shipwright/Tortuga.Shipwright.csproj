@@ -4,16 +4,14 @@
 		<TargetFrameworks>netstandard2.0</TargetFrameworks>
 		<Nullable>enable</Nullable>
 		<LangVersion>10.0</LangVersion>
-		<Authors>David Tomcik, Jonathan Allen</Authors>
+		<Authors>Jonathan Allen</Authors>
 		<Company>Tortuga Research</Company>
 		<Description>A trait engine for C#.</Description>
 		<PackageTags>Source Generator</PackageTags>
 		<ProductName>Tortuga Shipwright</ProductName>
 		<Deterministic>true</Deterministic>
 
-		<AssemblyVersion>0.6.0</AssemblyVersion>
-		<Version>0.6.0</Version>
-		<FileVersion>0.6.0</FileVersion>
+		<Version>0.9.0</Version>
 		<PackageLicenseExpression>MIT</PackageLicenseExpression>
 		<Copyright>Jonathan Allen 2022</Copyright>
 		<PackageProjectUrl>https://github.com/TortugaResearch/Shipwright</PackageProjectUrl>
@@ -26,17 +24,28 @@
 		
 		<DocumentationFile>Tortuga.Shipwright.xml</DocumentationFile>
 
+		<IncludeBuildOutput>false</IncludeBuildOutput>
+	    <NoWarn>$(NoWarn);NU5128</NoWarn>
 	</PropertyGroup>
-
+	
 	<ItemGroup>
-		<PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.1.0" PrivateAssets="all" />
+		<PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="3.9.0" PrivateAssets="all" />
 		<PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.3.3" PrivateAssets="all" />
 		<PackageReference Include="System.ObjectModel" Version="4.3.0" />
 	</ItemGroup>
-
+	
 	<ItemGroup>
-	  <None Remove="bin\Release\netstandard2.0\Tortuga.Shipwright.dll" />
+
+		<Compile Include="..\Tortuga.Shipwright.Shared\**\*.cs" Exclude="..\Tortuga.Shipwright.Shared\obj\**\*.cs">
+			<Link>referenced\%(RecursiveDir)%(Filename)%(Extension)</Link>
+		</Compile>
 	</ItemGroup>
+	
+	
+
+	<!--<ItemGroup>
+	  <None Remove="bin\Release\netstandard2.0\Tortuga.Shipwright.dll" />
+	</ItemGroup>-->
 
 
 	<ItemGroup>
@@ -44,34 +53,9 @@
 	</ItemGroup>
 
 
-
-	<!-- NuGet Packaging Boilerplate-->
 	<PropertyGroup Condition="'$(Configuration)'=='Release'">
 		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-		<GenerateNuspecDependsOn>$(GenerateNuspecDependsOn);ReadPackageVersionFromOutputAssembly</GenerateNuspecDependsOn>
 	</PropertyGroup>
-
-
-	<Target Name="ReadPackageVersionFromOutputAssembly" DependsOnTargets="Build" Condition="'$(IsCrossTargetingBuild)' == 'true'">
-
-		<PropertyGroup>
-			<FirstTargetFramework>$([System.String]::Copy($(TargetFrameworks)).Split(';').GetValue(0))</FirstTargetFramework>
-		</PropertyGroup>
-		<MSBuild Projects="$(MSBuildProjectFullPath)" Targets="ReadPackageVersionFromOutputAssemblySingleTfm" Properties="TargetFramework=$(FirstTargetFramework)">
-			<Output TaskParameter="TargetOutputs" ItemName="PackAssembly" />
-		</MSBuild>
-		<PropertyGroup>
-			<PackageVersion>%(PackAssembly.Version)</PackageVersion>
-		</PropertyGroup>
-	</Target>
-
-	<Target Name="ReadPackageVersionFromOutputAssemblySingleTfm" Returns="@(PackAssembly)" Condition="'$(IsCrossTargetingBuild)' != 'true'">
-		<GetAssemblyIdentity AssemblyFiles="$(TargetPath)">
-			<Output TaskParameter="Assemblies" ItemName="PackAssembly" />
-		</GetAssemblyIdentity>
-		<PropertyGroup>
-			<PackageVersion>%(PackAssembly.Version)</PackageVersion>
-		</PropertyGroup>
-	</Target>
+	
 
 </Project>

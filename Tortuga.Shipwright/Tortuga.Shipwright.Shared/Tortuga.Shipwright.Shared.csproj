@@ -1,0 +1,41 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  
+
+
+	<PropertyGroup>
+		<TargetFrameworks>netstandard2.0</TargetFrameworks>
+		<Nullable>enable</Nullable>
+		<LangVersion>10.0</LangVersion>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Authors>Jonathan Allen</Authors>
+		<Company>Tortuga Research</Company>
+		<Description>A trait engine for C#.</Description>
+		<PackageTags>Source Generator</PackageTags>
+		<ProductName>Tortuga Shipwright</ProductName>
+		<Deterministic>true</Deterministic>
+		<RootNamespace>Tortuga.Shipwright</RootNamespace>
+
+		<Version>0.9.0</Version>
+		<PackageLicenseExpression>MIT</PackageLicenseExpression>
+		<Copyright>Jonathan Allen 2022</Copyright>
+		<PackageProjectUrl>https://github.com/TortugaResearch/Shipwright</PackageProjectUrl>
+		<RepositoryUrl>https://github.com/TortugaResearch/Shipwright.git</RepositoryUrl>
+		<RepositoryType>git</RepositoryType>
+
+		<Nullable>enable</Nullable>
+		<TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+		<WarningsAsErrors />
+
+		<DocumentationFile>Tortuga.Shipwright.Shared.xml</DocumentationFile>
+
+	</PropertyGroup>
+
+
+	<PropertyGroup Condition="'$(Configuration)'=='Release'">
+		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+	</PropertyGroup>
+
+
+	
+</Project>
