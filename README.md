@@ -5,7 +5,7 @@
 
 To register the Source Generator, add the following to your project file.
 
-```
+````xml
 <!-- Code Generator -->
 <ItemGroup>
 	<PackageReference Include="Tortuga.Shipwright" Version="0.9.0" >
@@ -25,7 +25,7 @@ at least one subdirectory, which is our key that it's coming from a source gener
 some other tool. -->
 	<Compile Remove="$(CompilerGeneratedFilesOutputPath)/*/**/*.cs" />
 </ItemGroup>
-```
+````
 
 The `EmitCompilerGeneratedFiles` setting is not required, but it does make trouble-shooting easier. Check  `Show All Files" in Visual Studio to see the generated files.
 
@@ -46,20 +46,22 @@ Trait classes may be marked as `public` or, if in the same assembly, `internal`.
 
 The container class uses the `UseTrait` attribute and must be marked `partial`. For example:
 
-```
+````csharp
 [UseTrait(typeof(MyTrait)]
 public partial class MyContiner { ... }
-```
+````
 
 ### Exposing Members
 
 For a method or property, add the `Expose` attribute to the member.
 
-```
-[Expose] public int Add(int a, int b) {...}
+````csharp
+[Expose] 
+public int Add(int a, int b) {...}
 
-[Expose] public int CustomerAge {get; set;}
-```
+[Expose] 
+public int CustomerAge {get; set;}
+````
 
 The member being exposed must be visible to the container. This means `public` or, if in the same assembly, `internal`.
 
@@ -67,18 +69,18 @@ The member being exposed must be visible to the container. This means `public` o
 
 To make a exposed member non-public in the container class, set the Accessibility property. For example,
 
-```
+````csharp
 [Expose(Accessibility = Accessibility.Internal)]
 public ICacheAdapter Cache { get; set; } = null!;
-```
+````
 
 
 You may also set an inheritance rule such as `override`, `sealed`, or `virtual`.
 
-```
+````csharp
 [Expose(Inheritance = Inheritance.Override)]
 public ConcurrentDictionary<Type, object> ExtensionCache {get => m_ExtensionCache;}
-```
+````
 
 #### Additional Attributes
 
@@ -92,10 +94,10 @@ The following attributes will be copied from an exposed trait member to the matc
 To allow the trait to get a reference to it's container, use the `Container` attribute.
 
 
-```
+````csharp
 [Container]
 internal IDataSource DataSource { get; set; } = null!;
-```
+````
 
 There is no limit to the number of `Container` properties in a trait. (Presumably each would request a different interface.)
 
@@ -107,16 +109,16 @@ In lieu of using a container property (see above), a trait can request a specifi
 
 Define the 'partial' property in the trait as a `Func` or `Action` delegate.
 
-```
+````csharp
 [Partial("customerKey,startDate,endDate"] 
 public Func<int, DateTime, DateTime, OrderCollection> OnGetOrdersByCustomer {get; set;} = null!;
-```
+````
 
 In the container, the following will be generated.
 
-```
+````csharp
 private partial OrderCollection OnGetOrdersByCustomer(int customerKey, DateTime startDate, DateTime endDate);
-```
+````
 
 
 The container will then be responsible for implementing the partial method. 
