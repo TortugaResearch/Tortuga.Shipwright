@@ -42,9 +42,9 @@ public class TraitGenerator : ISourceGenerator
 
                 //Determine if we need a Register Traits method.
 
-                var partialProperties = workItem.TraitClasses.SelectMany(m => m.GetMembers()).OfType<IPropertySymbol>().Where(m => m.HasAttribute<PartialAttribute>()).ToList();
+                var partialProperties = workItem.TraitClasses.SelectMany(m => m.TraitClass.GetMembers()).OfType<IPropertySymbol>().Where(m => m.HasAttribute<PartialAttribute>()).ToList();
 
-                var ownerProperties = workItem.TraitClasses.SelectMany(m => m.GetMembers()).OfType<IPropertySymbol>().Where(m => m.HasAttribute<ContainerAttribute>()).ToList();
+                var ownerProperties = workItem.TraitClasses.SelectMany(m => m.TraitClass.GetMembers()).OfType<IPropertySymbol>().Where(m => m.HasAttribute<ContainerAttribute>()).ToList();
 
                 bool useRegisterTraits = partialProperties.Any() || ownerProperties.Any();
 
@@ -53,15 +53,15 @@ public class TraitGenerator : ISourceGenerator
                 //receiver.Log.Add($"Found {ownerProperties.Count} owner properties.");
 
                 //Find the list of interfaces
-                var interfacesNamesA = workItem.TraitClasses.SelectMany(wi => wi.AllInterfaces);
-                var interfacesNamesB = workItem.TraitClasses.SelectMany(x => x.GetMembers()).OfType<IPropertySymbol>()
+                var interfacesNamesA = workItem.TraitClasses.SelectMany(wi => wi.TraitClass.AllInterfaces);
+                var interfacesNamesB = workItem.TraitClasses.SelectMany(x => x.TraitClass.GetMembers()).OfType<IPropertySymbol>()
                     .Where(x => (bool)(x.GetAttribute<ContainerAttribute>()?.NamedArguments.SingleOrDefault(x => x.Key == "RegisterInterface").Value.Value ?? false)).Select(x => x.Type).OfType<INamedTypeSymbol>();
 
                 var interfacesNames = interfacesNamesA.Concat(interfacesNamesB)
                     .Distinct<INamedTypeSymbol>(SymbolEqualityComparer.Default).Select(i => i.FullName().NotNullType()).ToList();
                 var interfaceString = interfacesNames.Any() ? ": " + string.Join(", ", interfacesNames) : "";
 
-                var traitFieldNames = workItem.TraitClasses.Select((Trait, Index) => (Trait, Index))
+                var traitFieldNames = workItem.TraitClasses.Select(t => t.TraitClass).Select((Trait, Index) => (Trait, Index))
                     .ToDictionary(item => item.Trait, item => "__Trait" + item.Index, (IEqualityComparer<INamedTypeSymbol>)SymbolEqualityComparer.Default);
 
                 code.AppendLine();
@@ -98,7 +98,7 @@ public class TraitGenerator : ISourceGenerator
         }
 
         //Write the log entries
-        context.AddSource("Logs", SourceText.From($@"/*{ Environment.NewLine + string.Join(Environment.NewLine, receiver.Log) + Environment.NewLine}*/", Encoding.UTF8));
+        context.AddSource("Logs", SourceText.From($@"/*{Environment.NewLine + string.Join(Environment.NewLine, receiver.Log) + Environment.NewLine}*/", Encoding.UTF8));
     }
 
     /// <summary>
@@ -110,6 +110,18 @@ public class TraitGenerator : ISourceGenerator
     {
         // Register a syntax receiver that will be created for each generation pass
         context.RegisterForSyntaxNotifications(() => new SyntaxReceiver());
+    }
+
+    static string ArgumentMod(RefKind kind)
+    {
+        return kind switch
+        {
+            RefKind.Ref => "ref ",
+            RefKind.Out => "out ",
+            //RefKind.In => "in ",
+            //RefKind.RefReadOnly => "ref readonly ",
+            _ => ""
+        };
     }
 
     static List<string> CopyAttributes(ISymbol member)
@@ -222,7 +234,7 @@ public class TraitGenerator : ISourceGenerator
 
                 var returnType = isAction ? "void" : propertyType.TypeArguments.Last().TryFullName();
 
-                code.AppendLine($"private partial {returnType} {propertySymbol.Name}({string.Join(", ", parameters) } );");
+                code.AppendLine($"private partial {returnType} {propertySymbol.Name}({string.Join(", ", parameters)} );");
                 code.AppendLine();
             }
         }
@@ -233,7 +245,7 @@ public class TraitGenerator : ISourceGenerator
         using (code.BeginScope("private void __RegisterTraits()"))
         {
             code.AppendLine("__TraitsRegistered = true;");
-            foreach (var traitClass in workItem.TraitClasses)
+            foreach (var traitClass in workItem.TraitClasses.Select(t => t.TraitClass))
             {
                 foreach (var partialProperty in traitClass.GetMembers()
                         .OfType<IPropertySymbol>().Where(m => m.HasAttribute<PartialAttribute>()))
@@ -275,10 +287,10 @@ public class TraitGenerator : ISourceGenerator
     static void ExplicitlyImplementInterfaces(SyntaxReceiver receiver, WorkItem workItem, CodeWriter code, Dictionary<INamedTypeSymbol, string> traitFieldNames)
     {
         //Map the interfaces to traits
-        foreach (var interfaceType in workItem.TraitClasses.SelectMany(wi => wi.AllInterfaces).Distinct<INamedTypeSymbol>(SymbolEqualityComparer.Default).OrderBy(i => i.Name))
+        foreach (var interfaceType in workItem.TraitClasses.SelectMany(wi => wi.TraitClass.AllInterfaces).Distinct<INamedTypeSymbol>(SymbolEqualityComparer.Default).OrderBy(i => i.Name))
         {
             code.AppendLine("// Explicit interface implementation " + interfaceType.FullName());
-            var matchingTrait = workItem.TraitClasses.First(t => t.AllInterfaces.Contains(interfaceType, SymbolEqualityComparer.Default));
+            var matchingTrait = workItem.TraitClasses.First(t => t.TraitClass.AllInterfaces.Contains(interfaceType, SymbolEqualityComparer.Default)).TraitClass;
 
             var fieldReference = $"(({interfaceType.FullName()}){traitFieldNames[matchingTrait]})";
 
@@ -361,8 +373,6 @@ public class TraitGenerator : ISourceGenerator
         }
     }
 
-    //    return result;
-    //}
     private static void ExposePublicMembers(SyntaxReceiver receiver, WorkItem workItem, CodeWriter code, Dictionary<INamedTypeSymbol, string> traitFieldNames)
     {
         if (receiver == null)
@@ -378,23 +388,40 @@ public class TraitGenerator : ISourceGenerator
             throw new ArgumentException($"{nameof(traitFieldNames)} is null or empty.", nameof(traitFieldNames));
 
         //Expose the trait methods, properties, and events.
-        foreach (var traitClass in workItem.TraitClasses.OrderBy(wi => wi.Name))
+        foreach (var traitBundle in workItem.TraitClasses.OrderBy(wi => wi.TraitClass.Name))
         {
+            var traitClass = traitBundle.TraitClass;
             var fieldReference = traitFieldNames[traitClass];
 
             code.AppendLine($"// Exposing trait {traitClass.FullName()}");
             code.AppendLine();
 
-            foreach (var member in traitClass.GetMembers().Where(m => m.HasAttribute<ExposeAttribute>()).OrderBy(m => m.Name))
+            foreach (var member in traitClass.GetMembers().Where(m => m.HasAttribute<ExposeAttribute>() || traitBundle.AutoExpose != Expose.None).OrderBy(m => m.Name))
             {
-                var exposeAttribute = member.GetAttribute<ExposeAttribute>()!;
+                var exposeAttribute = member.GetAttribute<ExposeAttribute>();
+
+                if (exposeAttribute == null) //Additional checks for auto-expose.
+                {
+                    if (member.DeclaredAccessibility != Microsoft.CodeAnalysis.Accessibility.Public)
+                        continue; //We can only expose public methods on auto-exposed traits
+
+                    //If AssociatedSymbol != null, this it is part of a property or event.
+                    if (member is IMethodSymbol methodSymbol && (!traitBundle.AutoExpose.HasFlag(Expose.Methods) || methodSymbol.MethodKind != MethodKind.Ordinary))
+                        continue;
+                    if (member is IPropertySymbol && !traitBundle.AutoExpose.HasFlag(Expose.Properties))
+                        continue;
+                    if (member is IEventSymbol && !traitBundle.AutoExpose.HasFlag(Expose.Events))
+                        continue;
+
+                    receiver.Log.Add($"Auto-exposing {member.Name}");
+                }
 
                 var attributeStrings = CopyAttributes(member);
 
                 //receiver.Log.Add("Inheritance value type = " + exposeAttribute.NamedArguments.SingleOrDefault(x => x.Key == "Inheritance").Value.Value?.GetType().FullName);
 
-                var accessibilityOption = exposeAttribute.GetNamedArgument("Accessibility", Accessibility.Public);
-                var inheritanceOption = exposeAttribute.GetNamedArgument("Inheritance", Inheritance.None);
+                var accessibilityOption = exposeAttribute?.GetNamedArgument("Accessibility", Accessibility.Public) ?? Accessibility.Public;
+                var inheritanceOption = exposeAttribute?.GetNamedArgument("Inheritance", Inheritance.None) ?? Inheritance.None;
 
                 var accessibility = accessibilityOption switch
                 {
@@ -431,7 +458,7 @@ public class TraitGenerator : ISourceGenerator
                             var signature = $"{accessibility}{inheritance}{returnType} {methodSymbol.FullName()}({parameters}){methodSymbol.TypeConstraintString()}";
 
                             var invokerPrefix = (methodSymbol.ReturnsVoid) ? "" : "return ";
-                            var arguments = string.Join(", ", methodSymbol.Parameters.Select(p => p.Name));
+                            var arguments = string.Join(", ", methodSymbol.Parameters.Select(p => $"{ParameterMod(p.RefKind)}{p.Name}"));
                             var invoker = $"{invokerPrefix}{fieldReference}.{methodSymbol.FullName()}({arguments});";
 
                             code.AppendMultipleLines(member.GetXmlDocs());
@@ -458,9 +485,9 @@ public class TraitGenerator : ISourceGenerator
                             var propertyType = (INamedTypeSymbol)propertySymbol.Type;
                             var propertyTypeName = propertyType.FullName();
 
-                            var getterOption = (Getter)(exposeAttribute.NamedArguments.SingleOrDefault(x => x.Key == "Getter").Value.Value ?? Getter.None)
+                            var getterOption = (Getter)(exposeAttribute?.NamedArguments.SingleOrDefault(x => x.Key == "Getter").Value.Value ?? Getter.None)
                                 ;
-                            var setterOption = (Setter)(exposeAttribute.NamedArguments.SingleOrDefault(x => x.Key == "Setter").Value.Value ?? Setter.None);
+                            var setterOption = (Setter)(exposeAttribute?.NamedArguments.SingleOrDefault(x => x.Key == "Setter").Value.Value ?? Setter.None);
 
                             var signature = $"{accessibility} {inheritance} {propertyTypeName} {propertySymbol.Name}";
 
@@ -538,6 +565,18 @@ public class TraitGenerator : ISourceGenerator
         }
     }
 
+    static string ParameterMod(RefKind kind)
+    {
+        return kind switch
+        {
+            RefKind.Ref => "ref ",
+            RefKind.Out => "out ",
+            //RefKind.In => "in ",
+            //RefKind.RefReadOnly => "ref readonly ",
+            _ => ""
+        };
+    }
+
     static string ParameterWithDefault(IParameterSymbol parameter)
     {
         if (parameter.IsParams)
@@ -567,6 +606,6 @@ public class TraitGenerator : ISourceGenerator
             }
         }
         else
-            return $"{parameter.Type.TryFullName()} {parameter.Name}";
+            return $"{ParameterMod(parameter.RefKind)}{parameter.Type.TryFullName()} {parameter.Name}";
     }
 }

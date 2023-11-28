@@ -13,6 +13,12 @@ public class UseTraitAttribute : Attribute
     public UseTraitAttribute(Type traitType) { TraitType = traitType; }
 
     /// <summary>
+    /// If enabled, automatically expose members even if they don't have the ExposeAttribute.
+    /// </summary>
+    /// <remarks>This is used when the class being exposed is 3rd party. All members will be exposed as public.</remarks>
+    public Expose AutoExpose { get; set; } = Expose.None;
+
+    /// <summary>
     /// Gets the type of the trait.
     /// </summary>
     /// <value>The type of the trait.</value>

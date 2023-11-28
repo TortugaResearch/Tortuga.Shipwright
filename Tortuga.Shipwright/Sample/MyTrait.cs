@@ -3,35 +3,28 @@ using Tortuga.Shipwright;
 
 namespace Sample;
 
+public interface IMath
+{
+    event EventHandler<EventArgs>? ValueChanged;
+
+    int BaseValue { get; set; }
+
+    //Not support yet. See Task-2
+    int Counter { get; set; }
+
+    [Obsolete]
+    public string IAmAlsoBad { get; }
+
+    int Add(int a, int b);
+}
+
 public class MyTrait : IMath
 {
-    [Expose] public string Name => "Mr. " + OnGetName();
-
-    [Partial]
-    public Func<string> OnGetName { get; set; } = null!;
-
-
-    [Partial]
-    public Action SimpleAction { get; set; } = null!;
-
-
-    /// <summary>
-    /// Gets or sets the counter.
-    /// </summary>
-    /// <value>The counter.</value>
-    /// <remarks>This should be copied from the trait to the container.</remarks>
-    [Expose]
-    public int Counter { get; set; }
-
-    int IMath.Add(int a, int b)
-    {
-        throw new NotImplementedException();
-    }
-
-    [Container(RegisterInterface = true)]
-    public IHasPets Container { get; set; } = null!;
-
     int baseValue;
+
+    [Expose]
+    public event EventHandler<EventArgs>? ValueChanged;
+
     int IMath.BaseValue
     {
         get => baseValue;
@@ -42,20 +35,22 @@ public class MyTrait : IMath
         }
     }
 
+    [Container(RegisterInterface = true)]
+    public IHasPets Container { get; set; } = null!;
+
+    /// <summary>
+    /// Gets or sets the counter.
+    /// </summary>
+    /// <value>The counter.</value>
+    /// <remarks>This should be copied from the trait to the container.</remarks>
     [Expose]
-    public string AllPets()
-    {
-        return "Sunshine, Flipper, and " + Container.Pets;
-    }
-
-    [Expose]
-    public event EventHandler<EventArgs>? ValueChanged;
-
-    public void OnValueChanged() => ValueChanged?.Invoke(this, EventArgs.Empty);
-
+    public int Counter { get; set; }
 
     [Container(IsOptional = true)]
     public IHasCustomerKey? CustomerKeyProvider { get; set; }
+
+    string IMath.IAmAlsoBad => throw new NotImplementedException();
+    [Expose] public string Name => "Mr. " + OnGetName();
 
     [Obsolete()]
     [Expose]
@@ -71,31 +66,36 @@ public class MyTrait : IMath
     [EditorBrowsable(EditorBrowsableState.Advanced)]
     public bool OldMethodC { get; set; }
 
-    string IMath.IAmAlsoBad => throw new NotImplementedException();
+    [Partial]
+    public Func<string> OnGetName { get; set; } = null!;
+
+    [Partial]
+    public Action SimpleAction { get; set; } = null!;
+
+    int IMath.Add(int a, int b)
+    {
+        throw new NotImplementedException();
+    }
+
+    [Expose]
+    public string AllPets()
+    {
+        return "Sunshine, Flipper, and " + Container.Pets;
+    }
+
+    public void OnValueChanged() => ValueChanged?.Invoke(this, EventArgs.Empty);
 }
 
-
-public interface IMath
+public class SimpleTrait
 {
-    int Add(int a, int b);
+    //Note that this doesn't use ExposeAttribute, so you need to use auto-expose instead.
 
+    public string? Name { get; set; }
 
-    //Not support yet. See Task-2
-    int Counter { get; set; }
-
-    int BaseValue { get; set; }
-
-    event EventHandler<EventArgs>? ValueChanged;
-
-    [Obsolete]
-    public string IAmAlsoBad { get; }
-
+    public int GetNameLength() => Name?.Length ?? 0;
 }
-
 
 public interface IHasPets
 {
     public string Pets { get; }
-
-
 }
