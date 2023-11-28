@@ -11,7 +11,7 @@
 		<ProductName>Tortuga Shipwright</ProductName>
 		<Deterministic>true</Deterministic>
 
-		<Version>0.9.0</Version>
+		<Version>0.10.0</Version>
 		<PackageLicenseExpression>MIT</PackageLicenseExpression>
 		<Copyright>Jonathan Allen 2022</Copyright>
 		<PackageProjectUrl>https://github.com/TortugaResearch/Shipwright</PackageProjectUrl>

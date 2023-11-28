@@ -1,4 +1,6 @@
 ﻿/*
+Container class: Sample.MyAutoContainer
+	Adding trait: Sample.SimpleTrait
 Container class: Sample.MyContainer
 	Adding trait: Sample.MyTrait
 Container class: Sample.SimpleContainer

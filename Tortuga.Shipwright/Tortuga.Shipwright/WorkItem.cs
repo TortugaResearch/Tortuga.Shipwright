@@ -2,14 +2,40 @@
 
 namespace Tortuga.Shipwright;
 
-class WorkItem
+class AnnotatedTraitClass
 {
-	public WorkItem(INamedTypeSymbol hostingClass)
-	{
-		ContainerClass = hostingClass ?? throw new ArgumentNullException(nameof(hostingClass));
-	}
+    public AnnotatedTraitClass(INamedTypeSymbol traitClass, Expose autoExpose)
+    {
+        TraitClass = traitClass;
+        AutoExpose = autoExpose;
+    }
 
-	public INamedTypeSymbol ContainerClass { get; }
-	public HashSet<INamedTypeSymbol> TraitClasses { get; } = new(SymbolEqualityComparer.Default);
+    public Expose AutoExpose { get; }
+    public INamedTypeSymbol TraitClass { get; }
 }
 
+class WorkItem
+{
+    public WorkItem(INamedTypeSymbol hostingClass)
+    {
+        ContainerClass = hostingClass ?? throw new ArgumentNullException(nameof(hostingClass));
+    }
+
+    public INamedTypeSymbol ContainerClass { get; }
+    public HashSet<AnnotatedTraitClass> TraitClasses { get; } = new(AnnotatedTraitClassComparer.Default);
+}
+
+class AnnotatedTraitClassComparer : IEqualityComparer<AnnotatedTraitClass>
+{
+    public static AnnotatedTraitClassComparer Default = new AnnotatedTraitClassComparer();
+
+    public bool Equals(AnnotatedTraitClass x, AnnotatedTraitClass y)
+    {
+        return SymbolEqualityComparer.Default.Equals(x.TraitClass, y.TraitClass);
+    }
+
+    public int GetHashCode(AnnotatedTraitClass obj)
+    {
+        return SymbolEqualityComparer.Default.GetHashCode(obj.TraitClass);
+    }
+}
