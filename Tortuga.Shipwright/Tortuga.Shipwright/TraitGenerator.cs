@@ -112,6 +112,18 @@ public class TraitGenerator : ISourceGenerator
         context.RegisterForSyntaxNotifications(() => new SyntaxReceiver());
     }
 
+    static string ArgumentMod(RefKind kind)
+    {
+        return kind switch
+        {
+            RefKind.Ref => "ref ",
+            RefKind.Out => "out ",
+            //RefKind.In => "in ",
+            //RefKind.RefReadOnly => "ref readonly ",
+            _ => ""
+        };
+    }
+
     static List<string> CopyAttributes(ISymbol member)
     {
         var result = new List<string>();
@@ -390,6 +402,9 @@ public class TraitGenerator : ISourceGenerator
 
                 if (exposeAttribute == null) //Additional checks for auto-expose.
                 {
+                    if (member.DeclaredAccessibility != Microsoft.CodeAnalysis.Accessibility.Public)
+                        continue; //We can only expose public methods on auto-exposed traits
+
                     //If AssociatedSymbol != null, this it is part of a property or event.
                     if (member is IMethodSymbol methodSymbol && (!traitBundle.AutoExpose.HasFlag(Expose.Methods) || methodSymbol.MethodKind != MethodKind.Ordinary))
                         continue;
@@ -443,7 +458,7 @@ public class TraitGenerator : ISourceGenerator
                             var signature = $"{accessibility}{inheritance}{returnType} {methodSymbol.FullName()}({parameters}){methodSymbol.TypeConstraintString()}";
 
                             var invokerPrefix = (methodSymbol.ReturnsVoid) ? "" : "return ";
-                            var arguments = string.Join(", ", methodSymbol.Parameters.Select(p => p.Name));
+                            var arguments = string.Join(", ", methodSymbol.Parameters.Select(p => $"{ParameterMod(p.RefKind)}{p.Name}"));
                             var invoker = $"{invokerPrefix}{fieldReference}.{methodSymbol.FullName()}({arguments});";
 
                             code.AppendMultipleLines(member.GetXmlDocs());
@@ -550,6 +565,18 @@ public class TraitGenerator : ISourceGenerator
         }
     }
 
+    static string ParameterMod(RefKind kind)
+    {
+        return kind switch
+        {
+            RefKind.Ref => "ref ",
+            RefKind.Out => "out ",
+            //RefKind.In => "in ",
+            //RefKind.RefReadOnly => "ref readonly ",
+            _ => ""
+        };
+    }
+
     static string ParameterWithDefault(IParameterSymbol parameter)
     {
         if (parameter.IsParams)
@@ -579,6 +606,6 @@ public class TraitGenerator : ISourceGenerator
             }
         }
         else
-            return $"{parameter.Type.TryFullName()} {parameter.Name}";
+            return $"{ParameterMod(parameter.RefKind)}{parameter.Type.TryFullName()} {parameter.Name}";
     }
 }

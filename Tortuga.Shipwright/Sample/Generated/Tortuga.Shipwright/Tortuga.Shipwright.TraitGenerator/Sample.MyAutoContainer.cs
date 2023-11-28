@@ -10,5 +10,17 @@ namespace Sample
 
 		// Exposing trait Sample.SimpleTrait
 
+		
+		public System.Int32 GetNameLength()
+		{
+			return __Trait0.GetNameLength();
+		}
+
+		
+		public   System.String? Name
+		{
+			get => __Trait0.Name;
+			set => __Trait0.Name = value;
+		}
 	}
 }

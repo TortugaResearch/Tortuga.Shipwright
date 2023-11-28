@@ -8,6 +8,11 @@ public partial class MyAutoContainer : IHasCustomerKey
     public int CustomerKey => 15;
 }
 
+[UseTrait(typeof(System.IO.MemoryStream), AutoExpose = Expose.MethodsAndProperties)]
+public partial class MyAutoContainer2
+{
+}
+
 [UseTrait(typeof(MyTrait))]
 public partial class MyContainer : IHasCustomerKey
 {
