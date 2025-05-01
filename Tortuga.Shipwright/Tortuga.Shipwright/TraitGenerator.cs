@@ -67,7 +67,11 @@ public class TraitGenerator : ISourceGenerator
                 code.AppendLine();
                 using (code.BeginScope($"namespace {workItem.ContainerClass.FullNamespace()}"))
                 {
-                    using (code.BeginScope($"partial class {workItem.ContainerClass.Name}{interfaceString}"))
+                    var genericString = "";
+                    if (workItem.ContainerClass.IsGenericType)
+                        genericString = "<" + string.Join(", ", workItem.ContainerClass.TypeParameters.Select(x => x.Name)) + ">";
+
+                    using (code.BeginScope($"partial class {workItem.ContainerClass.Name}{genericString}{interfaceString}"))
                     {
                         code.AppendLine();
                         if (useRegisterTraits)
