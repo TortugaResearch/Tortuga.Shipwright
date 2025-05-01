@@ -2,6 +2,11 @@
 
 namespace Sample;
 
+public interface IHasCustomerKey
+{
+    int CustomerKey { get; }
+}
+
 [UseTrait(typeof(SimpleTrait), AutoExpose = Expose.MethodsAndProperties)]
 public partial class MyAutoContainer : IHasCustomerKey
 {
@@ -47,7 +52,19 @@ public partial class SimpleContainer
     }
 }
 
-public interface IHasCustomerKey
+[UseTrait(typeof(MyTrait))]
+public partial class MyGenericContainer<T> : IHasCustomerKey
 {
-    int CustomerKey { get; }
+    public int CustomerKey => 5;
+
+    string IHasPets.Pets => "Spot";
+
+    private partial string OnGetName()
+    {
+        return GetType().Name;
+    }
+
+    private partial void SimpleAction()
+    {
+    }
 }
