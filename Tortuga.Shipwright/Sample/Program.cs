@@ -6,10 +6,13 @@ Console.WriteLine("Hello, World!");
 
 var container = new MyContainer();
 
-
 Console.WriteLine("My name is " + container.Name);
 
 Console.WriteLine("My pet is named " + container.AllPets());
 
 container.Counter += 5;
 Console.WriteLine(container.Counter);
+
+var newContainer = new MyAutoContainer();
+newContainer.Name = "Fish";
+Console.WriteLine(newContainer.Name);
